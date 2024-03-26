@@ -1,0 +1,14 @@
+node_modules
+lib
+dist
+.nuxt
+playground/.nuxt
+playground/.output
+
+src/runtime/css/output.css
+
+graphql/translations.graphql
+
+npmBuild/
+
+playground/translations.graphql
