@@ -1,8 +1,12 @@
 {
   "name": "nuxt-page-dependencies",
   "version": "1.0.0",
-  "description": "Have components be dependend on data from a page component during SSR.",
+  "description": "Defer rendering of components that depend on page data during SSR",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dulnan/nuxt-page-dependencies.git"
+  },
   "exports": {
     ".": {
       "types": "./dist/types.d.ts",

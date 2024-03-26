@@ -6,6 +6,10 @@ This Nuxt 3 module implements a way to defer rendering of components (think
 breadcrumbs, language links) outside of the tree of a page component until page
 rendering is done.
 
+The obvious solution would be to put all components that depend on page data
+into the page component itself. But this would render them on every route
+change, which is most likely not what we want.
+
 ## Setup
 
 ```
