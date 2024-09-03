@@ -4,12 +4,8 @@ import { useSlots, useNuxtApp, useError } from '#imports'
 export default defineComponent({
   name: 'NuxtPageDependency',
 
-  props: {
-    tag: {
-      type: String,
-      default: 'div',
-    },
-  },
+  // Fixes "[Vue warn]: Extraneous non-props attributes (data-v-inspector) were passed to component but could not be automatically inherited because component renders fragment or text root nodes."
+  inheritAttrs: false,
 
   setup() {
     const slots = useSlots()
