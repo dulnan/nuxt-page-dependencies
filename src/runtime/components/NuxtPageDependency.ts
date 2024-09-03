@@ -1,35 +1,40 @@
 import { defineComponent } from 'vue'
-import { useSlots, useNuxtApp, useError } from '#imports'
+import { useNuxtApp } from '#imports'
 
 export default defineComponent({
   name: 'NuxtPageDependency',
 
-  // Fixes "[Vue warn]: Extraneous non-props attributes (data-v-inspector) were passed to component but could not be automatically inherited because component renders fragment or text root nodes."
+  // Fixes "[Vue warn]: Extraneous non-props attributes (data-v-inspector)
+  // were passed to component but could not be automatically inherited because
+  // component renders fragment or text root nodes."
   inheritAttrs: false,
 
-  setup() {
-    const slots = useSlots()
-    if (!slots.default) {
+  setup(_props, ctx) {
+    if (!ctx.slots.default) {
       return
     }
 
-    const nuxtApp = useNuxtApp()
+    // Renders the default slot.
+    const renderSlot = function () {
+      return ctx.slots.default!()
+    }
 
     if (import.meta.server) {
-      const error = useError()
+      const nuxtApp = useNuxtApp()
+
+      // We can early return without a promise in some cases.
+      if (nuxtApp.payload.error || nuxtApp._nuxtPageDependenciesRendered) {
+        return renderSlot
+      }
 
       // Defer rendering the component until the page component has rendered.
-      return new Promise((resolve) => {
-        const resolver = () => {
-          resolve(() => slots.default!())
+      return new Promise(function (resolve) {
+        const resolver = function () {
+          resolve(renderSlot)
         }
 
         // If Nuxt has an error, immediately render the component.
-        if (error.value) {
-          return resolver()
-        }
-
-        if (nuxtApp._nuxtPageDependenciesRendered) {
+        if (nuxtApp.payload.error || nuxtApp._nuxtPageDependenciesRendered) {
           return resolver()
         }
 
@@ -42,6 +47,6 @@ export default defineComponent({
       })
     }
 
-    return () => slots.default!()
+    return renderSlot
   },
 })
