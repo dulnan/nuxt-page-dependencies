@@ -1,9 +1,13 @@
 export default defineNuxtConfig({
   ssr: true,
-  modules: ['../src/module'],
+  modules: ['../src/module', '@nuxt/eslint'],
 
   imports: {
     autoImport: false,
+  },
+
+  pageDependencies: {
+    checkComposableCalled: ['foobar', 'renderPageDependencies'],
   },
 
   app: {
