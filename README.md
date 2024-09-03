@@ -12,16 +12,13 @@ change, which is most likely not what we want.
 
 ## Setup
 
-```
+```bash
 npm install --save nuxt-page-dependencies
 ```
 
 ```typescript
 export default defineNuxtConfig({
   modules: ['nuxt-page-dependencies'],
-  pageDependencies: {
-    checkComposableCalled: true,
-  },
 })
 ```
 
@@ -176,6 +173,49 @@ setBreadcrumbs(page.value.breadcrumb)
 
 // Render the dependent components.
 await renderPageDependencies()
+</script>
+```
+
+## Custom composables
+
+For the `checkComposableCalled` option you may also provide an array of
+composable names to check, for example if you create your own composable that
+fetches page data and sets global state and calls `renderPageDependencies`.
+
+```typescript
+export default defineNuxtConfig({
+  modules: ['nuxt-page-dependencies'],
+  pageDependencies: {
+    checkComposableCalled: ['renderPageDependencies', 'loadPageData'],
+  },
+})
+```
+
+```typescript
+export async function loadPageData(): Promise<PageData> {
+  const route = useRoute()
+  const data = await useFetch('/api/load-page-data', {
+    query: {
+      id: route.params.id,
+    },
+  })
+
+  setBreadcrumbs(data.breadcrumbs)
+
+  // Call the composable so that <NuxtPageDependency> components can be rendered.
+  await renderPageDependencies()
+}
+```
+
+```vue
+<template>
+  <div>
+    <h1>{{ page?.title }}</h1>
+  </div>
+</template>
+
+<script setup lang="ts">
+const page = await loadPageData()
 </script>
 ```
 
