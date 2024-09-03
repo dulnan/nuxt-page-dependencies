@@ -47,13 +47,13 @@
     "@nuxt/kit": "^3.10.2"
   },
   "devDependencies": {
+    "@nuxt/eslint": "^0.5.5",
     "@nuxt/module-builder": "^0.5.5",
     "@nuxt/schema": "^3.10.2",
-    "@nuxtjs/eslint-config-typescript": "^12.1.0",
     "@types/node": "^20.11.19",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-prettier": "^5.2.1",
     "nuxt": "^3.13.0",
     "prettier": "^3.2.5"
   }
