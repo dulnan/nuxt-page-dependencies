@@ -33,6 +33,10 @@ const links = computed(() => {
       label: 'Trigger page error',
     },
     {
+      url: '/long-rendering',
+      label: 'Long Rendering',
+    },
+    {
       url: '/trigger-page-error?triggerAppError=true',
       label: 'Trigger app.vue error',
     },
