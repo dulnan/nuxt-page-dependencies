@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { name, version } from '../package.json'
 import {
   createResolver,
   defineNuxtModule,
@@ -23,11 +24,11 @@ export type ModuleOptions = {
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
-    name: 'nuxt-page-dependencies',
+    name,
     configKey: 'pageDependencies',
-    version: '1.0.0',
+    version,
     compatibility: {
-      nuxt: '^3.1.0',
+      nuxt: '>=3.1.0',
     },
   },
   defaults: {
