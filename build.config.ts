@@ -1,5 +1,3 @@
 import { defineBuildConfig } from 'unbuild'
 
-export default defineBuildConfig({
-  externals: ['#imports'],
-})
+export default defineBuildConfig({})

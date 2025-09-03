@@ -5,7 +5,7 @@
       <Breadcrumb />
     </NuxtPageDependency>
     <div>
-      <slot></slot>
+      <slot />
     </div>
   </div>
 </template>

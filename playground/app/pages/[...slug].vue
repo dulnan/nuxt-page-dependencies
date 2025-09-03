@@ -18,7 +18,7 @@ const route = useRoute()
 const { setBreadcrumbs } = useBreadcrumb()
 const { setNewsletterVisibility } = useFooter()
 
-const { data: page } = await useAsyncData(() => {
+const { data: page } = await useAsyncData(route.path, () => {
   return $fetch('/api/get-page', {
     query: {
       path: route.path,

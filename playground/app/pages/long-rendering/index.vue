@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import { customApiLoader, useAsyncData } from '#imports'
 
-const { data } = await useAsyncData(() => {
+const { data } = await useAsyncData('long-rendering', () => {
   return customApiLoader()
 })
 </script>

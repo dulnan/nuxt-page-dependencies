@@ -34,37 +34,9 @@ export default defineNuxtModule<ModuleOptions>({
   defaults: {
     checkComposableCalled: true,
   },
-  setup(options) {
+  setup(options, nuxt) {
+    const isDev = nuxt.options.dev
     const { resolve } = createResolver(import.meta.url)
-
-    if (options.checkComposableCalled) {
-      const validComposables: string[] = (
-        typeof options.checkComposableCalled === 'boolean'
-          ? ['renderPageDependencies']
-          : options.checkComposableCalled
-      ).map((v) => `${v}(`)
-
-      function callsComposable(content: string): boolean {
-        return validComposables.some((v) => content.includes(v))
-      }
-      const errorString = validComposables.map((v) => `"${v}"`).join(' or ')
-
-      extendPages((pages) => {
-        pages.forEach((page) => {
-          if (!page.file) {
-            return
-          }
-
-          fs.promises.readFile(page.file).then((contents) => {
-            if (!callsComposable(contents.toString())) {
-              throw new Error(
-                `Page component "${page.file}" does not call the ${errorString} composable, which is required.`,
-              )
-            }
-          })
-        })
-      })
-    }
 
     addComponent({
       filePath: resolve('./runtime/components/NuxtPageDependency'),
@@ -76,5 +48,84 @@ export default defineNuxtModule<ModuleOptions>({
       from: resolve('./runtime/composables/renderPageDependencies'),
       name: 'renderPageDependencies',
     })
+
+    if (!options.checkComposableCalled) {
+      return
+    }
+
+    // The valid composables. By default only `renderPageDependencies` is allowed.
+    const validComposables: string[] =
+      typeof options.checkComposableCalled === 'boolean'
+        ? ['renderPageDependencies']
+        : options.checkComposableCalled
+
+    const errorString = validComposables.map((v) => `"${v}"`).join(' or ')
+    const validComposableStrings = validComposables.map((v) => `${v}(`)
+
+    function callsComposable(content: string): boolean {
+      return validComposableStrings.some((v) => content.includes(v))
+    }
+
+    // Keep track of the pages we need to check.
+    const checkedPages = new Set<string>()
+
+    extendPages(async (pages) => {
+      const results = await Promise.all(
+        pages.map(async (page) => {
+          if (!page.file) {
+            return
+          }
+
+          if (checkedPages.has(page.file)) {
+            return
+          }
+
+          try {
+            const contents = await fs.promises
+              .readFile(page.file)
+              .then((v) => v.toString().trim())
+
+            const isValid = contents.length === 0 || callsComposable(contents)
+
+            if (isValid) {
+              checkedPages.add(page.file)
+              return
+            }
+
+            return `Page component "${page.file}" does not call the ${errorString} composable, which is required.`
+          } catch (e) {
+            if (isDev) {
+              return
+            }
+
+            throw e
+          }
+        }),
+      )
+
+      const message = results.filter(Boolean).join('\n')
+      if (!message) {
+        return
+      }
+
+      console.error(`[nuxt-page-dependencies] - ${message}`)
+
+      if (isDev) {
+        return
+      }
+
+      throw new Error(
+        `Can not build because not all page components await page dependencies.`,
+      )
+    })
+
+    if (isDev) {
+      nuxt.hook('builder:watch', async (_event, path) => {
+        if (path.includes('.vue')) {
+          // Force reloading of page component file contents.
+          checkedPages.delete(path)
+        }
+      })
+    }
   },
 })
