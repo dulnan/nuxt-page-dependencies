@@ -42,7 +42,7 @@ export default defineNuxtModule<ModuleOptions>({
         typeof options.checkComposableCalled === 'boolean'
           ? ['renderPageDependencies']
           : options.checkComposableCalled
-      ).map((v) => `${v}()`)
+      ).map((v) => `${v}(`)
 
       function callsComposable(content: string): boolean {
         return validComposables.some((v) => content.includes(v))
